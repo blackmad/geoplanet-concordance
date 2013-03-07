@@ -10,14 +10,19 @@ geocoder = Geocoder('localhost:20001')
 
 # 378466  La Pastora, La Pastora, Caaguazu, PY    7       26810910,2346451        9,8
 
-def trySearch(line, place, woetype):
+# town, admin3, suburb
+townWoeTypes = ['7', '10', '22']
+
+def trySearch(line, place, woetype):  
   woeTypes = [woetype]
-
-  # town, admin3, suburb
-  townWoeTypes = ['7', '10', '22']
-  if woetype in townWoeTypes:
+  try1 = trySearch(line, place, woeTypes)
+  if try1.status != 'success' and woetype in townWoeTypes:
     woeTypes = townWoeTypes
+    return trySearch(line, place, townWoeTypes)
+  else:
+    return try1
 
+def trySearch(line, place, woeTypes):
   try:
     g = geocoder.geocode(place, {
       'woeRestrict': ','.join(woeTypes),
