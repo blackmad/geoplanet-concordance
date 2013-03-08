@@ -6,7 +6,7 @@ from threaded_geocoder import *
 from geocoder import *
 import traceback
 
-geocoder = Geocoder('localhost:20001')
+geocoder = Geocoder('localhost:8081')
 
 # 378466  La Pastora, La Pastora, Caaguazu, PY    7       26810910,2346451        9,8
 
@@ -15,14 +15,14 @@ townWoeTypes = ['7', '10', '22']
 
 def trySearch(line, place, woetype):  
   woeTypes = [woetype]
-  try1 = trySearch(line, place, woeTypes)
+  try1 = trySearchHelper(line, place, woeTypes)
   if try1.status != 'success' and woetype in townWoeTypes:
     woeTypes = townWoeTypes
-    return trySearch(line, place, townWoeTypes)
+    return trySearchHelper(line, place, townWoeTypes)
   else:
     return try1
 
-def trySearch(line, place, woeTypes):
+def trySearchHelper(line, place, woeTypes):
   try:
     g = geocoder.geocode(place, {
       'woeRestrict': ','.join(woeTypes),
@@ -33,6 +33,7 @@ def trySearch(line, place, woeTypes):
     else:
       return GeocodeFailure(line.decode('utf-8'))
   except:
+      traceback.print_exc()
       print 'timeout'
       return GeocodeTimeout(line.decode('utf-8'))
 
